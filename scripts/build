@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -e
+
+docker-compose down || true
+docker run --rm --privileged multiarch/qemu-user-static:register --reset
+time docker-compose up

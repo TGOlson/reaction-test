@@ -1,0 +1,12 @@
+version: '2'
+
+volumes:
+  stack-root-cache: {}
+
+services:
+  reaction-test:
+    image: tgolson/rpi-haskell-classy
+    volumes:
+      - stack-root-cache:/root/.stack
+      - .:/home/build
+    command: /home/build/scripts/indocker/build
