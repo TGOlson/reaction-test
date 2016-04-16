@@ -33,7 +33,10 @@ keyboardInputInterface = InputInterface (void getChar) (return ())
 keyboardOutputInterface :: OutputInterface
 keyboardOutputInterface = OutputInterface putStrLn (return ()) (return ())
 
-
+-- Note: consumers of this inputInterface have trouble debouncing input events.
+-- It's important to know right when the button is clicked, but also buffer a bit
+-- around the release of the key...
+-- TODO: should there be a debounce or some sort of result stream?
 gpioInputInterface :: ActivePin 'In -> InputInterface
 gpioInputInterface p = InputInterface getGpioInput (closePin p)
   where

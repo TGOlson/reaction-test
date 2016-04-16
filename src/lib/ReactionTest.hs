@@ -55,7 +55,10 @@ main = do
         (forever $ runGame inputInterface outputInterface)
   where
     shutdownCleanly :: InputInterface -> OutputInterface -> SomeException -> IO ()
-    shutdownCleanly inputInterface outputInterface _ = iiClose inputInterface >> oiClose outputInterface
+    shutdownCleanly inputInterface outputInterface _ = do
+        putStrLn "Shutting down cleanly..."
+        iiClose inputInterface
+        oiClose outputInterface
 
 data GameState
     = NotStarted
@@ -78,21 +81,28 @@ runGame inputInterface outputInterface = do
     -- TODO: what is a better way to structure this?
 
     -- Wait for initial keypress to start the game
-    iiGetInput inputInterface
-    getCurrentTime >>= pushKeyPressEvent
+
+    -- Wait 300ms before asking for the next input event.
+    -- TODO: should these be baked into the IOInterface?
+    let getInput = do
+          delayMillis 300
+          iiGetInput inputInterface
+
+    getInput >> getCurrentTime >>= pushKeyPressEvent
 
     -- Fork a thread to push an event when the delay is over
     delayThread <- forkIO $ do
-        secDelay <- randomRIO (1, 7)
-        threadDelay (secDelay * 1000000)
+        millis <- randomRIO (1000, 7000)
+        delayMillis millis
         getCurrentTime >>= pushDelayEvent
 
-    -- Fork a thread to listen for the second key press.
+    getInput >> getCurrentTime >>= pushKeyPressEvent
+
     -- Kill the delayThread once we have the second key press.
-    void $ forkIO $ do
-        iiGetInput inputInterface
-        getCurrentTime >>= pushKeyPressEvent
-        killThread delayThread
+    killThread delayThread
+
+delayMillis :: Int -> IO ()
+delayMillis s = threadDelay (s * 1000)
 
 makeNetwork :: AddHandler UTCTime -> AddHandler UTCTime -> OutputInterface -> MomentIO ()
 makeNetwork keyPressHandler delayHandler outputInterface = do
