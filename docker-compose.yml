@@ -5,7 +5,7 @@ volumes:
 
 services:
   reaction-test:
-    image: tgolson/rpi-haskell-classy
+    image: tgolson/rpi-haskell-with-deps
     volumes:
       - stack-root-cache:/root/.stack
       - .:/home/build

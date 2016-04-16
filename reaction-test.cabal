@@ -18,7 +18,8 @@ library
   ghc-options:      -Wall
   default-language: Haskell2010
   exposed-modules:
-      ReactionTest
+      ReactionTest,
+      ReactionTest.IOInterface
   default-extensions:
       OverloadedStrings LambdaCase
       StandaloneDeriving FlexibleContexts ScopedTypeVariables
@@ -27,7 +28,8 @@ library
       base,
       reactive-banana,
       random,
-      time
+      time,
+      gpio
       -- basic-prelude,
       -- string-conversions,
       -- transformers,
